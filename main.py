@@ -31,8 +31,29 @@ else:
     app = FastAPI(title="PlotWeaver API", description="創作支援AI API - 本格モード")
 
 # 共通モジュール
-from prompt_templates import plot_templates
-from memory_manager import character_memory
+try:
+    from prompt_templates import plot_templates
+    from memory_manager import character_memory
+except ImportError as e:
+    print(f"⚠️ インポートエラー: {e}")
+    # 緊急時のモックオブジェクト
+    class MockTemplates:
+        def get_available_genres(self): return ["fantasy", "romance", "mystery"]
+        def get_genre_display_names(self): return {"fantasy": "ファンタジー"}
+        def get_template(self, genre): 
+            class MockTemplate:
+                def format(self, **kwargs): return f"テンプレート: {kwargs}"
+            return MockTemplate()
+    
+    class MockMemory:
+        def get_character_memory_string(self, names): return "キャラクター情報なし"
+        def add_conversation(self, prompt, response): pass
+        def get_all_characters(self): return {}
+        def get_character_info(self, name): return None
+        def add_character(self, **kwargs): pass
+    
+    plot_templates = MockTemplates()
+    character_memory = MockMemory()
 
 # CORS設定
 app.add_middleware(
