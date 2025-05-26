@@ -12,7 +12,7 @@
 ### 2. ローカルからGitHubへプッシュ
 ```bash
 # リモートリポジトリを追加
-git remote add origin https://github.com/YOUR_USERNAME/plotweaver.git
+git remote add origin https://github.com/TETEnot/plotweaver.git
 
 # メインブランチに変更
 git branch -M main
