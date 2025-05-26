@@ -76,15 +76,23 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "healthy",
-        "model_ready": llama_engine.is_ready(),
-        "available_genres": plot_templates.get_available_genres(),
-        "model_info": {
-            "path": llama_engine.model_path,
-            "loaded": llama_engine.is_ready()
+    try:
+        return {
+            "status": "healthy",
+            "model_ready": llama_engine.is_ready(),
+            "available_genres": plot_templates.get_available_genres(),
+            "model_info": {
+                "path": llama_engine.model_path,
+                "loaded": llama_engine.is_ready()
+            },
+            "test_mode": TEST_MODE
         }
-    }
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e),
+            "test_mode": TEST_MODE
+        }
 
 @app.post("/generate")
 async def generate_plot(request: PlotGenerationRequest):
@@ -312,4 +320,6 @@ async def add_character_development(character_name: str, development: dict):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
