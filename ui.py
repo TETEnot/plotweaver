@@ -54,7 +54,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # API設定
-API_BASE_URL = "http://localhost:8000"  # 開発時はlocalhost、本番時はRender URL
+import os
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")  # 環境変数から取得、デフォルトはlocalhost
 
 def check_api_health():
     """APIの健康状態をチェック"""

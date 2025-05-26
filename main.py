@@ -5,12 +5,34 @@ from typing import List, Optional, Dict, Any
 import json
 import os
 
-# 自作モジュールのインポート
-from llama_engine import llama_engine
+# 環境変数チェック
+TEST_MODE = os.getenv("TEST_MODE", "false").lower() == "true"
+
+if TEST_MODE:
+    # テストモード: モックデータを使用
+    print("🧪 テストモードで起動中...")
+    app = FastAPI(title="PlotWeaver API", description="創作支援AI API - テストモード")
+    
+    # モックレスポンス用の関数
+    def mock_generate(prompt, **kwargs):
+        return f"【テストモード】{prompt}に基づく生成されたプロット例です。実際のLLMモデルは使用されていません。"
+    
+    class MockEngine:
+        def is_ready(self): return True
+        def generate(self, prompt, **kwargs): return mock_generate(prompt, **kwargs)
+        @property
+        def model_path(self): return "テストモード（モックデータ）"
+    
+    llama_engine = MockEngine()
+else:
+    # 本格モード: 実際のLLMを使用
+    print("🚀 本格モードで起動中...")
+    from llama_engine import llama_engine
+    app = FastAPI(title="PlotWeaver API", description="創作支援AI API - 本格モード")
+
+# 共通モジュール
 from prompt_templates import plot_templates
 from memory_manager import character_memory
-
-app = FastAPI(title="PlotWeaver API", description="創作支援AI API - 本格モード")
 
 # CORS設定
 app.add_middleware(

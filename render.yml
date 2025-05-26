@@ -2,14 +2,19 @@ services:
   - type: web
     name: plotweaver-api
     env: python
-    plan: free
-    buildCommand: pip install -r requirement.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    plan: starter
+    buildCommand: |
+      pip install -r requirement.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHONPATH
         value: .
       - key: PYTHONUNBUFFERED
         value: 1
+      - key: MODEL_PATH
+        value: ""
+      - key: TEST_MODE
+        value: "true"
     healthCheckPath: /health
     
   - type: web
@@ -17,9 +22,11 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirement.txt
-    startCommand: streamlit run ui.py --server.port 8501 --server.address 0.0.0.0
+    startCommand: streamlit run ui.py --server.port $PORT --server.address 0.0.0.0
     envVars:
       - key: PYTHONPATH
         value: .
       - key: PYTHONUNBUFFERED
         value: 1
+      - key: API_BASE_URL
+        value: "https://plotweaver-api.onrender.com"
